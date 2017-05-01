@@ -8,20 +8,22 @@ struct Node{
 };
 typedef struct Node node;
 
-int tam;
+int tam = 0;
 
 void inicia(node *Lista);
 int menu(void);
 void opcao(node *Lista, int op);
-void inserePosicao(node *Lista);
-void insereFim(node *Lista);
-void insereInicio(node *Lista);
-void insereAntesValor(node *Lista);
+int vazia(node *Lista);
+node *aloca();
 void exibe(node *Lista);
 void libera(node *Lista);
+void insereInicio(node *Lista);
+void insereFim(node *Lista);
+void inserePosicao(node *Lista);
+void insereAntesValor(node *Lista);
 node *retiraInicio(node *Lista);
 node *retiraFim(node *Lista);
-node *retira(node *Lista);
+node *retiraPosicao(node *Lista);
 node *retiraValor(node *Lista);
 
 
@@ -76,7 +78,6 @@ int menu(void){
 }
 
 void opcao(node *Lista, int op){
-	node *tmp;
 	switch(op){
 		case 0:
 			libera(Lista);
@@ -116,7 +117,7 @@ void opcao(node *Lista, int op){
 			break;
 
 		case 9:
-            retira(Lista);
+            retiraPosicao(Lista);
 			break;
 
         case 10:
@@ -136,7 +137,7 @@ int vazia(node *Lista){
 }
 
 node *aloca(){
-	node *novo=(node *) malloc(sizeof(node));
+	node *novo = (node *) malloc(sizeof(node));
 	if(!novo){
 		printf("Sem memoria disponivel!\n");
 		exit(1);
@@ -144,34 +145,6 @@ node *aloca(){
 		printf("Novo elemento: "); scanf("%d", &novo->num);
 		return novo;
 	}
-}
-
-void insereFim(node *Lista){
-	node *novo = aloca();
-	novo->prox = NULL;
-
-	if(vazia(Lista))
-		Lista->prox=novo;
-	else{
-		node *tmp = Lista->prox;
-
-		while(tmp->prox != NULL)
-			tmp = tmp->prox;
-
-		tmp->prox = novo;
-	}
-	tam++;
-}
-
-void insereInicio(node *Lista){
-    //a lista pode estar vazia
-	node *novo=aloca();
-	node *oldHead = Lista->prox;
-
-	Lista->prox = novo;
-	novo->prox = oldHead;
-
-	tam++;
 }
 
 void exibe(node *Lista){
@@ -210,7 +183,36 @@ void libera(node *Lista){
 			free(atual);
 			atual = proxNode;
 		}
+	}else{
+        printf("Lista já está vazia!\n\n");
 	}
+}
+
+void insereInicio(node *Lista){
+	node *novo = aloca();
+	node *oldHead = Lista->prox;
+
+	Lista->prox = novo;
+	novo->prox = oldHead;
+
+	tam++;
+}
+
+void insereFim(node *Lista){
+	node *novo = aloca();
+	novo->prox = NULL;
+
+	if(vazia(Lista))
+		Lista->prox=novo;
+	else{
+		node *tmp = Lista->prox;
+
+		while(tmp->prox != NULL)
+			tmp = tmp->prox;
+
+		tmp->prox = novo;
+	}
+	tam++;
 }
 
 void inserePosicao(node *Lista){
@@ -222,21 +224,21 @@ void inserePosicao(node *Lista){
 		if(pos==1)
 			insereInicio(Lista);
 		else{
-			node *atual = Lista->prox,
-				 *anterior=Lista;
-			node *novo=aloca();
+			node *atual = Lista->prox;
+			node *anterior = Lista;
+			node *novo = aloca();
 
 			for(count=1 ; count < pos ; count++){
-					anterior=atual;
-					atual=atual->prox;
+					anterior = atual;
+					atual = atual->prox;
 			}
-			anterior->prox=novo;
+			anterior->prox = novo;
 			novo->prox = atual;
 			tam++;
 		}
 
 	}else
-		printf("Elemento invalido\n\n");
+		printf("Posição inválida!\n\n");
 }
 
 void insereAntesValor(node *Lista){
@@ -257,7 +259,7 @@ void insereAntesValor(node *Lista){
             printf("Número não está lista!\n");
         }else{
             novo->prox = aux->prox;
-        aux->prox = novo;
+            aux->prox = novo;
         tam++;
         }
     }
@@ -295,15 +297,15 @@ node *retiraFim(node *Lista){
 	}
 }
 
-node *retira(node *Lista){
+node *retiraPosicao(node *Lista){
 	int opt, count;
 	printf("Que posicao, [de 1 ate %d] voce deseja retirar: ", tam);
 	scanf("%d", &opt);
 
 	if(opt>0 && opt <= tam){
-		if(opt==1)
+		if(opt==1){
 			return retiraInicio(Lista);
-		else{
+        }else{
 			node *atual = Lista->prox;
             node *anterior = Lista;
 
@@ -312,13 +314,13 @@ node *retira(node *Lista){
 				atual = atual->prox;
 			}
 
-		anterior->prox = atual->prox;
-		tam--;
-		return atual;
+            anterior->prox = atual->prox;
+            tam--;
+            return atual;
 		}
 
 	}else{
-		printf("Elemento invalido\n\n");
+		printf("Posição invalida!\n\n");
 		return NULL;
 	}
 }
@@ -351,6 +353,3 @@ node *retiraValor(node *Lista){
         return Lista;
     }
 }
-
-
-
